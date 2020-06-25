@@ -1,59 +1,83 @@
 import 'package:flutter/material.dart';
-import 'package:shoppy/models/product.dart';
+import 'package:provider/provider.dart';
+import 'package:shoppy/providers/cart_provider.dart';
+import 'package:shoppy/providers/product.dart';
+import 'package:shoppy/providers/products_provider.dart';
+import 'package:shoppy/screens/cart_screen.dart';
+import 'package:shoppy/widgets/badge.dart';
 import 'package:shoppy/widgets/product_item.dart';
 
-class ProductsScreen extends StatelessWidget {
-  final products =[
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-      'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Yellow Scarf',
-      description: 'Warm and cozy - exactly what you need for the winter.',
-      price: 19.99,
-      imageUrl:
-      'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'A Pan',
-      description: 'Prepare any meal you want.',
-      price: 49.99,
-      imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
-  ];
+enum MenuOptions {
+  All,
+  Favourites,
+}
+
+class ProductsScreen extends StatefulWidget {
+  @override
+  _ProductsScreenState createState() => _ProductsScreenState();
+}
+
+class _ProductsScreenState extends State<ProductsScreen> {
+  var showFavourites = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Shoppy'),
-      ),
-      body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 4 / 3,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+        actions: <Widget>[
+          Consumer<CartProvider>(
+            builder: (BuildContext context, CartProvider cart, Widget child) {
+              return Badge(value: cart.productsCount.toString(), child: child);
+            },
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.SCREEN_ID);
+              },
+            ),
           ),
-          itemCount: products.length,
-          itemBuilder: (context, i){
-            return ProductItem(product: products[i]);
-          }),
+          PopupMenuButton(
+            onSelected: (value) {
+              setState(() {
+                if (value == MenuOptions.All)
+                  showFavourites = false;
+                else
+                  showFavourites = true;
+              });
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(child: Text('All'), value: MenuOptions.All),
+              PopupMenuItem(child: Text('Favourites'), value: MenuOptions.Favourites)
+            ],
+          ),
+        ],
+      ),
+      body: ProductsGrid(showFavourites),
     );
+  }
+}
+
+class ProductsGrid extends StatelessWidget {
+  final bool showFavourites;
+
+  ProductsGrid(this.showFavourites);
+
+  @override
+  Widget build(BuildContext context) {
+    List<Product> products = showFavourites
+        ? Provider.of<ProductsProvider>(context).favouriteList
+        : Provider.of<ProductsProvider>(context).productList;
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 4 / 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: products.length,
+        itemBuilder: (context, i) {
+          return ChangeNotifierProvider.value(value: products[i], child: ProductItem());
+        });
   }
 }
