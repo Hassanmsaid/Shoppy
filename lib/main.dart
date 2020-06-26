@@ -6,8 +6,6 @@ import 'package:shoppy/screens/cart_screen.dart';
 import 'package:shoppy/screens/product_details_screen.dart';
 import 'package:shoppy/screens/products_screen.dart';
 
-import 'models/cart.dart';
-
 void main() {
   runApp(MyApp());
 }
@@ -23,7 +21,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         theme: ThemeData(
-            primaryColor: Colors.grey[850], accentColor: Colors.orange, fontFamily: 'Lato'),
+          primaryColor: Colors.grey[850],
+          accentColor: Colors.orange,
+          fontFamily: 'Lato',
+        ),
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         home: ProductsScreen(),

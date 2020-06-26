@@ -19,11 +19,29 @@ class CartProvider with ChangeNotifier {
               price: currentProduct.price,
               quantity: currentProduct.quantity + 1));
     } else {
-      _items.putIfAbsent(product.id,
-          () => Cart(id: product.id, title: product.title, price: product.price, quantity: 1));
+      _items.putIfAbsent(
+          product.id,
+          () => Cart(
+              id: DateTime.now().toString(),
+              title: product.title,
+              price: product.price,
+              quantity: 1));
     }
     notifyListeners();
   }
 
   int get productsCount => _items.length;
+
+  double get total {
+    double total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
+  }
+
+  void deleteItem(String prodId) {
+    _items.remove(prodId);
+    notifyListeners();
+  }
 }
