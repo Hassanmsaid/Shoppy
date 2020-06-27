@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:shoppy/models/cart.dart';
-import 'package:shoppy/providers/product.dart';
+import 'package:shoppy/providers/product_provider.dart';
 
 class CartProvider with ChangeNotifier {
   Map<String, Cart> _items = {};
