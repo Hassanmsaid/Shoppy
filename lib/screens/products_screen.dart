@@ -5,6 +5,7 @@ import 'package:shoppy/providers/product_provider.dart';
 import 'package:shoppy/providers/products_provider.dart';
 import 'package:shoppy/screens/cart_screen.dart';
 import 'package:shoppy/widgets/badge.dart';
+import 'package:shoppy/widgets/nav_drawer.dart';
 import 'package:shoppy/widgets/product_item.dart';
 
 enum MenuOptions {
@@ -13,6 +14,8 @@ enum MenuOptions {
 }
 
 class ProductsScreen extends StatefulWidget {
+  static const SCREEN_ID = 'products_screen';
+
   @override
   _ProductsScreenState createState() => _ProductsScreenState();
 }
@@ -53,6 +56,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ),
         ],
       ),
+      drawer: NavDrawer(),
       body: ProductsGrid(showFavourites),
     );
   }
