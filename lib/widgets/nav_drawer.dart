@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shoppy/screens/orders_screen.dart';
 import 'package:shoppy/screens/products_screen.dart';
+import 'package:shoppy/screens/user_products_screen.dart';
 
 class NavDrawer extends StatelessWidget {
   @override
@@ -38,6 +39,17 @@ class NavDrawer extends StatelessWidget {
             trailing: Icon(Icons.receipt),
             onTap: () {
               Navigator.of(context).pushReplacementNamed(OrdersScreen.SCREEN_ID);
+            },
+          ),
+          Container(
+            height: 1,
+            color: Colors.grey,
+          ),
+          ListTile(
+            leading: Text('My Products'),
+            trailing: Icon(Icons.widgets),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed(UserProductsScreen.SCREEN_ID);
             },
           ),
         ],

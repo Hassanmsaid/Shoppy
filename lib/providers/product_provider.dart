@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
 class Product extends ChangeNotifier {
-  final String id, title, description, imageUrl;
-  final double price;
+  String id, title, description, imageUrl;
+  double price;
   bool isFavourite;
 
   Product(

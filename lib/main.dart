@@ -5,9 +5,11 @@ import 'package:shoppy/providers/order_provider.dart';
 import 'package:shoppy/providers/product_provider.dart';
 import 'package:shoppy/providers/products_provider.dart';
 import 'package:shoppy/screens/cart_screen.dart';
+import 'package:shoppy/screens/edit_product_screen.dart';
 import 'package:shoppy/screens/orders_screen.dart';
 import 'package:shoppy/screens/product_details_screen.dart';
 import 'package:shoppy/screens/products_screen.dart';
+import 'package:shoppy/screens/user_products_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
           ProductDetailsScreen.SCREEN_ID: (context) => ProductDetailsScreen(),
           CartScreen.SCREEN_ID: (context) => CartScreen(),
           OrdersScreen.SCREEN_ID: (context) => OrdersScreen(),
+          UserProductsScreen.SCREEN_ID: (context) => UserProductsScreen(),
+          EditProductScreen.SCREEN_ID: (context) => EditProductScreen(),
         },
       ),
     );
