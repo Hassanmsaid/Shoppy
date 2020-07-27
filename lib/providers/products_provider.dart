@@ -42,4 +42,16 @@ class ProductsProvider with ChangeNotifier {
   Product getProductById(String id) {
     return _productList.firstWhere((element) => element.id == id);
   }
+
+  void addProduct(Product product) {
+    product.id = DateTime.now().toString();
+    _productList.add(product);
+    notifyListeners();
+  }
+
+  void updateProduct(Product updatedProduct) {
+    final index = _productList.lastIndexWhere((element) => element.id == updatedProduct.id);
+    _productList[index] = updatedProduct;
+    notifyListeners();
+  }
 }

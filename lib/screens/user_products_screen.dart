@@ -4,6 +4,8 @@ import 'package:shoppy/providers/products_provider.dart';
 import 'package:shoppy/widgets/nav_drawer.dart';
 import 'package:shoppy/widgets/user_product_item.dart';
 
+import 'edit_product_screen.dart';
+
 class UserProductsScreen extends StatelessWidget {
   static const SCREEN_ID = 'user_products_screen';
 
@@ -14,6 +16,14 @@ class UserProductsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Products'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              Navigator.pushNamed(context, EditProductScreen.SCREEN_ID);
+            },
+          ),
+        ],
       ),
       drawer: NavDrawer(),
       body: Container(

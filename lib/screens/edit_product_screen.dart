@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shoppy/providers/product_provider.dart';
+import 'package:shoppy/providers/products_provider.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const SCREEN_ID = 'edit_screen';
@@ -13,10 +15,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
   final _descFocus = FocusNode();
   final _imgFocus = FocusNode();
   final _imgController = TextEditingController();
-  String url = "";
+  String _imgUrl = "";
   final _formKey = GlobalKey<FormState>();
   var _editedProduct =
       Product(id: null, title: null, description: null, imageUrl: null, price: null);
+  var isInit = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!isInit) {
+      final _product = ModalRoute.of(context).settings.arguments as Product;
+      if (_product != null) {
+        _editedProduct = _product;
+        _imgController.text = _editedProduct.imageUrl;
+        setState(() {
+          _imgUrl = _editedProduct.imageUrl;
+        });
+      }
+    }
+    isInit = true;
+  }
 
   @override
   void dispose() {
@@ -28,13 +47,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _saveForm() {
-    if (_formKey.currentState.validate()) return;
+    if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
-    print(_editedProduct.title);
-    print(_editedProduct.price);
-    print(_editedProduct.description);
-    print(_editedProduct.imageUrl);
+    if (_editedProduct.id == null) {
+      Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct);
+    } else {
+      Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct);
+    }
+    Navigator.of(context).pop();
   }
+
+  void updateImage() {}
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +81,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: Column(
               children: <Widget>[
                 TextFormField(
+                  initialValue: _editedProduct.title,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(labelText: 'Product title', fillColor: Colors.indigo),
                   onFieldSubmitted: (_) => FocusScope.of(context).requestFocus(_priceFocus),
@@ -68,6 +92,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   },
                 ),
                 TextFormField(
+                  initialValue: _editedProduct.price == null ? '' : _editedProduct.price.toString(),
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(labelText: 'Product price', fillColor: Colors.indigo),
                   keyboardType: TextInputType.numberWithOptions(signed: false),
@@ -82,6 +107,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   },
                 ),
                 TextFormField(
+                  initialValue: _editedProduct.description,
                   textInputAction: TextInputAction.newline,
                   decoration:
                       InputDecoration(labelText: 'Product Description', fillColor: Colors.indigo),
@@ -106,12 +132,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         keyboardType: TextInputType.url,
                         onChanged: (val) {
                           setState(() {
-                            url = val;
+                            _imgUrl = val;
                           });
                         },
                         onSaved: (val) => _editedProduct.imageUrl = val,
                         validator: (val) {
                           if (val.isEmpty) return 'Please enter image url';
+                          //TODO add Regex validation
+                          if (!val.startsWith('http') &&
+                              !val.startsWith('https') &&
+                              !val.endsWith('.png') &&
+                              !val.endsWith('.jpg') &&
+                              !val.endsWith('.jpeg')) return 'Enter a valid url';
                           return null;
                         },
                       ),
@@ -128,7 +160,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               child: Text('Enter image url'),
                             )
                           : FittedBox(
-                              child: Image.network(url),
+                              child: Image.network(_imgUrl),
                               fit: BoxFit.cover,
                             ),
                     ),
