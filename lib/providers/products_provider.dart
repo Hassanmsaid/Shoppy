@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:shoppy/providers/product_provider.dart';
 
 class ProductsProvider with ChangeNotifier {
@@ -43,10 +46,25 @@ class ProductsProvider with ChangeNotifier {
     return _productList.firstWhere((element) => element.id == id);
   }
 
-  void addProduct(Product product) {
-    product.id = DateTime.now().toString();
-    _productList.add(product);
-    notifyListeners();
+  Future addProduct(Product product) {
+    const url = 'https://shoppy-60a.firebaseio.com/products.json';
+    return http
+        .post(url,
+            body: json.encode({
+              "id": product.id,
+              "title": product.title,
+              "price": product.price,
+              "description": product.description,
+              "image_url": product.imageUrl,
+              "is_favourite": product.isFavourite,
+            }))
+        .catchError((error) {
+      throw error;
+    }).then((response) {
+      product.id = json.decode(response.body)['name'];
+      _productList.add(product);
+      notifyListeners();
+    });
   }
 
   void updateProduct(Product updatedProduct) {
