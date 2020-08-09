@@ -23,6 +23,10 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   var showFavourites = false, _isLoading = false;
 
+  Future _refresh() async {
+    await Provider.of<ProductsProvider>(context, listen: false).getAllProducts();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -39,43 +43,44 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Shoppy'),
-        actions: <Widget>[
-          Consumer<CartProvider>(
-            builder: (BuildContext context, CartProvider cart, Widget child) {
-              return Badge(value: cart.productsCount.toString(), child: child);
-            },
-            child: IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: () {
-                Navigator.of(context).pushNamed(CartScreen.SCREEN_ID);
+        appBar: AppBar(
+          title: Text('Shoppy'),
+          actions: <Widget>[
+            Consumer<CartProvider>(
+              builder: (BuildContext context, CartProvider cart, Widget child) {
+                return Badge(value: cart.productsCount.toString(), child: child);
               },
+              child: IconButton(
+                icon: Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(CartScreen.SCREEN_ID);
+                },
+              ),
             ),
-          ),
-          PopupMenuButton(
-            onSelected: (value) {
-              setState(() {
-                if (value == MenuOptions.All)
-                  showFavourites = false;
-                else
-                  showFavourites = true;
-              });
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem(child: Text('All'), value: MenuOptions.All),
-              PopupMenuItem(child: Text('Favourites'), value: MenuOptions.Favourites)
-            ],
-          ),
-        ],
-      ),
-      drawer: NavDrawer(),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : ProductsGrid(showFavourites),
-    );
+            PopupMenuButton(
+              onSelected: (value) {
+                setState(() {
+                  if (value == MenuOptions.All)
+                    showFavourites = false;
+                  else
+                    showFavourites = true;
+                });
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(child: Text('All'), value: MenuOptions.All),
+                PopupMenuItem(child: Text('Favourites'), value: MenuOptions.Favourites)
+              ],
+            ),
+          ],
+        ),
+        drawer: NavDrawer(),
+        body: RefreshIndicator(
+            child: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : ProductsGrid(showFavourites),
+            onRefresh: _refresh));
   }
 }
 

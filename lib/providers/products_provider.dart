@@ -51,7 +51,6 @@ class ProductsProvider with ChangeNotifier {
   Future getAllProducts() async {
     try {
       final response = await http.get(url);
-      print(json.decode(response.body));
       final fetchedProducts = json.decode(response.body) as Map<String, dynamic>;
       _productList.clear();
       fetchedProducts.forEach((key, value) {
@@ -63,6 +62,7 @@ class ProductsProvider with ChangeNotifier {
             price: value['price'],
             isFavourite: value['is_favourite']));
       });
+      notifyListeners();
     } catch (e) {
       throw e;
     }
