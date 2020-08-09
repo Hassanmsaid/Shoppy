@@ -175,11 +175,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               validator: (val) {
                                 if (val.isEmpty) return 'Please enter image url';
                                 //TODO add Regex validation
-                                if (!val.startsWith('http') &&
-                                    !val.startsWith('https') &&
-                                    !val.endsWith('.png') &&
-                                    !val.endsWith('.jpg') &&
-                                    !val.endsWith('.jpeg')) return 'Enter a valid url';
+                                if (!val.startsWith('http') && !val.startsWith('https'))
+                                  return 'Enter a valid url';
                                 return null;
                               },
                             ),
