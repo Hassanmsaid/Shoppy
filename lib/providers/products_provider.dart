@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:shoppy/models/custom_exception.dart';
 import 'package:shoppy/providers/product_provider.dart';
 
 class ProductsProvider with ChangeNotifier {
-  static const url = 'https://shoppy-60a.firebaseio.com/products.json';
+  static const baseUrl = 'https://shoppy-60a.firebaseio.com/products';
 
   List<Product> _productList = [
 //    Product(
@@ -50,7 +51,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future getAllProducts() async {
     try {
-      final response = await http.get(url);
+      final response = await http.get('$baseUrl.json');
       final fetchedProducts = json.decode(response.body) as Map<String, dynamic>;
       _productList.clear();
       fetchedProducts.forEach((key, value) {
@@ -70,7 +71,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future addProduct(Product product) {
     return http
-        .post(url,
+        .post('$baseUrl.json',
             body: json.encode({
               "id": product.id,
               "title": product.title,
@@ -88,14 +89,47 @@ class ProductsProvider with ChangeNotifier {
     });
   }
 
-  void updateProduct(Product updatedProduct) {
+  Future updateProduct(Product updatedProduct) async {
     final index = _productList.lastIndexWhere((element) => element.id == updatedProduct.id);
-    _productList[index] = updatedProduct;
+    if (index > -1) {
+      await http.patch('$baseUrl/${updatedProduct.id}.json',
+          body: json.encode({
+            "title": updatedProduct.title,
+            "price": updatedProduct.price,
+            "description": updatedProduct.description,
+            "image_url": updatedProduct.imageUrl,
+            "is_favourite": updatedProduct.isFavourite,
+          }));
+      _productList[index] = updatedProduct;
+      notifyListeners();
+    }
+  }
+
+  Future deleteProduct(String id) async {
+    final response = await http.delete('$baseUrl/$id.json');
+    if (response.statusCode != 200) {
+      throw CustomExceptions('Delete failed!');
+    }
+    _productList.removeWhere((prod) => prod.id == id);
     notifyListeners();
   }
 
-  void deleteProduct(String id) {
-    _productList.removeWhere((prod) => prod.id == id);
+  Future toggleFavourite(String id) async {
+    final product = _productList.firstWhere((element) => element.id == id);
+    final response = await http.patch('$baseUrl/$id.json',
+        body: json.encode({
+          "id": product.id,
+          "title": product.title,
+          "price": product.price,
+          "description": product.description,
+          "image_url": product.imageUrl,
+          "is_favourite": !product.isFavourite,
+        }));
+    if (response.statusCode == 200) {
+      product.isFavourite = !product.isFavourite;
+    } else {
+      throw CustomExceptions('Failed!');
+    }
     notifyListeners();
   }
 }

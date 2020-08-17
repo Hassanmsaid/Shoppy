@@ -47,7 +47,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _imgFocus.dispose();
   }
 
-  void _saveForm() {
+  void _saveForm() async {
     if (!_formKey.currentState.validate()) return;
     _formKey.currentState.save();
     _isLoading = true;
@@ -78,7 +78,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         Navigator.of(context).pop();
       });
     } else {
-      Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct);
+      await Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct);
       setState(() {
         _isLoading = false;
       });

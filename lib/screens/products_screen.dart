@@ -43,44 +43,45 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Shoppy'),
-          actions: <Widget>[
-            Consumer<CartProvider>(
-              builder: (BuildContext context, CartProvider cart, Widget child) {
-                return Badge(value: cart.productsCount.toString(), child: child);
+      appBar: AppBar(
+        title: Text('Shoppy'),
+        actions: <Widget>[
+          Consumer<CartProvider>(
+            builder: (BuildContext context, CartProvider cart, Widget child) {
+              return Badge(value: cart.productsCount.toString(), child: child);
+            },
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.SCREEN_ID);
               },
-              child: IconButton(
-                icon: Icon(Icons.shopping_cart),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(CartScreen.SCREEN_ID);
-                },
-              ),
             ),
-            PopupMenuButton(
-              onSelected: (value) {
-                setState(() {
-                  if (value == MenuOptions.All)
-                    showFavourites = false;
-                  else
-                    showFavourites = true;
-                });
-              },
-              itemBuilder: (_) => [
-                PopupMenuItem(child: Text('All'), value: MenuOptions.All),
-                PopupMenuItem(child: Text('Favourites'), value: MenuOptions.Favourites)
-              ],
-            ),
-          ],
-        ),
-        drawer: NavDrawer(),
-        body: RefreshIndicator(
-            child: _isLoading
-                ? Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : ProductsGrid(showFavourites),
-            onRefresh: _refresh));
+          ),
+          PopupMenuButton(
+            onSelected: (value) {
+              setState(() {
+                if (value == MenuOptions.All)
+                  showFavourites = false;
+                else
+                  showFavourites = true;
+              });
+            },
+            itemBuilder: (_) => [
+              PopupMenuItem(child: Text('All'), value: MenuOptions.All),
+              PopupMenuItem(child: Text('Favourites'), value: MenuOptions.Favourites)
+            ],
+          ),
+        ],
+      ),
+      drawer: NavDrawer(),
+      body: RefreshIndicator(
+          child: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ProductsGrid(showFavourites),
+          onRefresh: _refresh),
+    );
   }
 }
 
