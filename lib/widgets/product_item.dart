@@ -7,56 +7,70 @@ import 'package:shoppy/screens/product_details_screen.dart';
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<CartProvider>(context);
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed(ProductDetailsScreen.SCREEN_ID, arguments: product.id);
-      },
-      child: GridTile(
-        child: Image.network(
-          product.imageUrl,
-          fit: BoxFit.cover,
-        ),
-        footer: GridTileBar(
-          backgroundColor: Colors.grey.shade500.withOpacity(0.5),
-          leading: Consumer<Product>(
-            builder: (BuildContext context, value, Widget child) {
-              return IconButton(
-                icon: Icon(product.isFavourite ? Icons.favorite : Icons.favorite_border),
+    return Consumer<Product>(
+      builder: (BuildContext context, value, Widget child) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(ProductDetailsScreen.SCREEN_ID, arguments: value.id);
+          },
+          child: GridTile(
+            child: Image.network(
+              value.imageUrl,
+              fit: BoxFit.cover,
+            ),
+            footer: GridTileBar(
+              backgroundColor: Colors.grey.shade500.withOpacity(0.5),
+              leading: IconButton(
+                icon: value.isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(),
+                      )
+                    : Icon(value.isFavourite ? Icons.favorite : Icons.favorite_border),
                 onPressed: () {
-                  product.toggleFavourite();
+                  //TODO fix error
+                  value.toggleFavourite().catchError(
+                        (error) => Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Error happened!',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      );
                 },
-              );
-            },
+              ),
+              title: Text(
+                value.title,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+              trailing: IconButton(
+                icon: Icon(Icons.add_shopping_cart),
+                onPressed: () {
+                  cart.addItem(value);
+                  Scaffold.of(context).hideCurrentSnackBar();
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added ${value.title} to cart'),
+                      duration: Duration(seconds: 3),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {
+                          cart.removeSingleItem(value.id);
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
-          title: Text(
-            product.title,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-          trailing: IconButton(
-            icon: Icon(Icons.add_shopping_cart),
-            onPressed: () {
-              cart.addItem(product);
-              Scaffold.of(context).hideCurrentSnackBar();
-              Scaffold.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Added ${product.title} to cart'),
-                  duration: Duration(seconds: 3),
-                  action: SnackBarAction(
-                    label: 'Undo',
-                    onPressed: () {
-                      cart.removeSingleItem(product.id);
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

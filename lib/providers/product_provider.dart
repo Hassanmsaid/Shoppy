@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:shoppy/models/custom_exception.dart';
 import 'package:http/http.dart' as http;
+import 'package:shoppy/models/custom_exception.dart';
 
 class Product extends ChangeNotifier {
   String id, title, description, imageUrl;
@@ -18,10 +18,13 @@ class Product extends ChangeNotifier {
       this.isFavourite = false});
 
   static const baseUrl = 'https://shoppy-60a.firebaseio.com/products';
+  bool isLoading = false;
 
   Future toggleFavourite() async {
 //    final product = _productList.firstWhere((element) => element.id == id);
-    final response = await http.patch('$baseUrl/$id.json',
+    isLoading = true;
+    notifyListeners();
+    final response = await http.patch('$baseUrl/$id.jsons',
         body: json.encode({
           "id": id,
           "title": title,
@@ -30,11 +33,14 @@ class Product extends ChangeNotifier {
           "image_url": imageUrl,
           "is_favourite": !isFavourite,
         }));
+    isLoading = false;
+
     if (response.statusCode == 200) {
       isFavourite = !isFavourite;
+      notifyListeners();
     } else {
+      notifyListeners();
       throw CustomExceptions('Failed!');
     }
-    notifyListeners();
   }
 }

@@ -4,8 +4,23 @@ import 'package:shoppy/providers/order_provider.dart';
 import 'package:shoppy/widgets/nav_drawer.dart';
 import 'package:shoppy/widgets/order_item.dart';
 
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   static const SCREEN_ID = 'orders_screen';
+
+  @override
+  _OrdersScreenState createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  var _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<OrderProvider>(context, listen: false).getOrders().then((value) {
+      setState(() => _loading = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +31,11 @@ class OrdersScreen extends StatelessWidget {
         title: Text('My Orders'),
       ),
       drawer: NavDrawer(),
-      body: ListView.builder(itemCount: orders.length, itemBuilder: (_, i) => OrderItem(orders[i])),
+      body: _loading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(itemCount: orders.length, itemBuilder: (_, i) => OrderItem(orders[i])),
     );
   }
 }

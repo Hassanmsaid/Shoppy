@@ -54,7 +54,7 @@ class ProductDetailsScreen extends StatelessWidget {
                     '\$${currentProduct.price}',
                     style: TextStyle(fontSize: 20),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -64,7 +64,7 @@ class ProductDetailsScreen extends StatelessWidget {
               currentProduct.description,
               style: TextStyle(fontSize: 18),
             ),
-          )
+          ),
         ],
       ),
     );

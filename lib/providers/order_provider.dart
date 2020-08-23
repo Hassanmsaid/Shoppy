@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shoppy/models/cart.dart';
 
 class Order {
@@ -19,14 +22,56 @@ class OrderProvider with ChangeNotifier {
 
   List<Order> get orders => [..._orders];
 
-  void createOrder(List<Cart> cartProducts, double total) {
-    _orders.insert(
-        0,
-        Order(
-            id: DateTime.now().toString(),
-            totalAmount: total,
-            products: cartProducts,
-            dateTime: DateTime.now()));
+  final baseUrl = 'https://shoppy-60a.firebaseio.com/orders.json';
+
+  void createOrder(List<Cart> cartProducts, double total) async {
+    final timeStamp = DateTime.now();
+    final response = await http.post('$baseUrl',
+        body: json.encode({
+          'amount': total,
+          'date': timeStamp.toIso8601String(),
+          'products': cartProducts
+              .map((product) => {
+                    'id': product.id,
+                    'title': product.title,
+                    'quantity': product.quantity,
+                    'price': product.price,
+                  })
+              .toList()
+        }));
+    if (response.statusCode == 200) {
+      _orders.insert(
+          0,
+          Order(
+              id: json.decode(response.body)['title'],
+              totalAmount: total,
+              products: cartProducts,
+              dateTime: DateTime.now()));
+    }
     notifyListeners();
+  }
+
+  Future getOrders() async {
+    final response = await http.get(baseUrl);
+    if (response.statusCode == 200) {
+      List<Order> loadedOrders = [];
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      if (data == null) return;
+      data.forEach((key, value) {
+        loadedOrders.add(Order(
+          id: key,
+          totalAmount: value['amount'],
+          dateTime: DateTime.parse(value['date']),
+          products: (value['products'] as List<dynamic>).map((item) {
+            return Cart(
+                id: item['id'],
+                title: item['title'],
+                price: item['price'],
+                quantity: item['quantity']);
+          }).toList(),
+        ));
+      });
+      _orders = loadedOrders.reversed.toList();
+    }
   }
 }

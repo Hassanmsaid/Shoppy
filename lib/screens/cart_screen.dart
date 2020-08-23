@@ -37,21 +37,43 @@ class CartScreen extends StatelessWidget {
                       label: Text('\$${cart.total.toStringAsFixed(2)}',
                           style: TextStyle(fontSize: 20))),
                   Spacer(),
-                  RaisedButton(
-                    color: Theme.of(context).accentColor,
-                    onPressed: () {
-                      Provider.of<OrderProvider>(context, listen: false)
-                          .createOrder(cart.getItems.values.toList(), cart.total);
-                      cart.clear();
-                    },
-                    child: Text('Check out', style: TextStyle(fontSize: 20)),
-                  )
+                  CheckOutButton(cart: cart)
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class CheckOutButton extends StatefulWidget {
+  CheckOutButton({
+    this.cart,
+  });
+
+  final CartProvider cart;
+
+  @override
+  _CheckOutButtonState createState() => _CheckOutButtonState();
+}
+
+class _CheckOutButtonState extends State<CheckOutButton> {
+  var _loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton(
+      color: Theme.of(context).accentColor,
+      onPressed: () {
+        _loading
+            ? null
+            : Provider.of<OrderProvider>(context, listen: false)
+                .createOrder(widget.cart.getItems.values.toList(), widget.cart.total);
+        widget.cart.clear();
+      },
+      child: Text('Check out', style: TextStyle(fontSize: 20)),
     );
   }
 }

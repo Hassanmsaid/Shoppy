@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shoppy/providers/auth_provider.dart';
 import 'package:shoppy/providers/cart_provider.dart';
 import 'package:shoppy/providers/order_provider.dart';
 import 'package:shoppy/providers/product_provider.dart';
 import 'package:shoppy/providers/products_provider.dart';
+import 'package:shoppy/screens/auth_screen.dart';
 import 'package:shoppy/screens/cart_screen.dart';
 import 'package:shoppy/screens/edit_product_screen.dart';
 import 'package:shoppy/screens/orders_screen.dart';
@@ -24,25 +26,29 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductsProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => Product()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
-      child: MaterialApp(
-        theme: ThemeData(
-          primaryColor: Colors.grey[850],
-          accentColor: Colors.orange,
-          fontFamily: 'Lato',
+      child: Consumer<AuthProvider>(
+        builder: (context, authData, _) => MaterialApp(
+          theme: ThemeData(
+            primaryColor: Colors.grey[850],
+            accentColor: Colors.orange,
+            fontFamily: 'Lato',
+          ),
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          home: authData.authorized ? ProductsScreen() : AuthScreen(),
+          routes: {
+            AuthScreen.SCREEN_ID: (context) => AuthScreen(),
+            ProductsScreen.SCREEN_ID: (context) => ProductsScreen(),
+            ProductDetailsScreen.SCREEN_ID: (context) => ProductDetailsScreen(),
+            CartScreen.SCREEN_ID: (context) => CartScreen(),
+            OrdersScreen.SCREEN_ID: (context) => OrdersScreen(),
+            UserProductsScreen.SCREEN_ID: (context) => UserProductsScreen(),
+            EditProductScreen.SCREEN_ID: (context) => EditProductScreen(),
+          },
         ),
-        debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
-        initialRoute: ProductsScreen.SCREEN_ID,
-        routes: {
-          ProductsScreen.SCREEN_ID: (context) => ProductsScreen(),
-          ProductDetailsScreen.SCREEN_ID: (context) => ProductDetailsScreen(),
-          CartScreen.SCREEN_ID: (context) => CartScreen(),
-          OrdersScreen.SCREEN_ID: (context) => OrdersScreen(),
-          UserProductsScreen.SCREEN_ID: (context) => UserProductsScreen(),
-          EditProductScreen.SCREEN_ID: (context) => EditProductScreen(),
-        },
       ),
     );
   }
