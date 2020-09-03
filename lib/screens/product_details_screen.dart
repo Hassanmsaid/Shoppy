@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shoppy/providers/auth_provider.dart';
 import 'package:shoppy/providers/product_provider.dart';
 import 'package:shoppy/providers/products_provider.dart';
 
@@ -11,6 +12,7 @@ class ProductDetailsScreen extends StatelessWidget {
     print('prod details build');
     final prodId = ModalRoute.of(context).settings.arguments as String;
     final currentProduct = Provider.of<ProductsProvider>(context).getProductById(prodId);
+    final authData = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -22,7 +24,7 @@ class ProductDetailsScreen extends StatelessWidget {
               child:
                   currentProduct.isFavourite ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
               onPressed: () {
-                currentProduct.toggleFavourite();
+                currentProduct.toggleFavourite(authData.token, authData.userId);
               });
         },
       ),

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -100,7 +99,24 @@ class _AuthCardState extends State<AuthCard> {
     'password': '',
   };
   var _isLoading = false;
-  final _passwordController = TextEditingController(text: '123456');
+  var _email = '', _password = '';
+  final _passwordController = TextEditingController();
+
+  // final _passwordController = TextEditingController(text: '123456');
+  final _emailController = TextEditingController();
+
+  // final _emailController = TextEditingController(text: 'hassan@test.com');
+  AuthProvider _auth;
+
+  @override
+  void initState() {
+    super.initState();
+    _auth = Provider.of<AuthProvider>(context, listen: false);
+    setState(() => _isLoading = true);
+    _auth.autoLogin().then((value) {
+      setState(() => _isLoading = false);
+    });
+  }
 
   void _showError(String errorMsg) {
     showDialog(
@@ -130,12 +146,10 @@ class _AuthCardState extends State<AuthCard> {
     try {
       if (_authMode == AuthMode.Login) {
         // Log user in
-        await Provider.of<AuthProvider>(context, listen: false)
-            .signIn(_authData['email'], _authData['password']);
+        await _auth.signIn(_authData['email'], _authData['password']);
       } else {
         // Sign user up
-        await Provider.of<AuthProvider>(context, listen: false)
-            .signUp(_authData['email'], _authData['password']);
+        await _auth.signUp(_authData['email'], _authData['password']);
       }
     } on HttpException catch (error) {
       _showError(error.toString().substring(15));
@@ -179,6 +193,7 @@ class _AuthCardState extends State<AuthCard> {
             child: Column(
               children: <Widget>[
                 TextFormField(
+                  controller: _emailController,
                   decoration: InputDecoration(labelText: 'E-Mail'),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
@@ -207,7 +222,6 @@ class _AuthCardState extends State<AuthCard> {
                 ),
                 if (_authMode == AuthMode.Signup)
                   TextFormField(
-//                    initialValue: 'hassan@test.co',
                     enabled: _authMode == AuthMode.Signup,
                     decoration: InputDecoration(labelText: 'Confirm Password'),
                     obscureText: true,

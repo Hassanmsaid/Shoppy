@@ -10,13 +10,11 @@ class UserProductsScreen extends StatelessWidget {
   static const SCREEN_ID = 'user_products_screen';
 
   Future _refresh(BuildContext context) async {
-    await Provider.of<ProductsProvider>(context, listen: false).getAllProducts();
+    await Provider.of<ProductsProvider>(context, listen: false).getAllProducts(all: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<ProductsProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Products'),
@@ -30,16 +28,26 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: NavDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => _refresh(context),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 4),
-          child: ListView.builder(
-            itemCount: productsData.productList.length,
-            itemBuilder: (_, i) => Column(
-              children: <Widget>[UserProductItem(productsData.productList[i]), Divider()],
-            ),
-          ),
+      body: FutureBuilder(
+        future: _refresh(context),
+        builder: (ctx, snapshot) => RefreshIndicator(
+          onRefresh: () => _refresh(context),
+          child: snapshot.connectionState == ConnectionState.waiting
+              ? Center(child: CircularProgressIndicator())
+              : Container(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: Consumer<ProductsProvider>(
+                    builder: (ctx, productsData, _) => ListView.builder(
+                      itemCount: productsData.productList.length,
+                      itemBuilder: (_, i) => Column(
+                        children: <Widget>[
+                          UserProductItem(productsData.productList[i]),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
         ),
       ),
     );

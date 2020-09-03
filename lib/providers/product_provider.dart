@@ -17,22 +17,17 @@ class Product extends ChangeNotifier {
       @required this.price,
       this.isFavourite = false});
 
-  static const baseUrl = 'https://shoppy-60a.firebaseio.com/products';
+  static const baseUrl = 'https://shoppy-60a.firebaseio.com';
   bool isLoading = false;
 
-  Future toggleFavourite() async {
+  Future toggleFavourite(String token, String userId) async {
 //    final product = _productList.firstWhere((element) => element.id == id);
     isLoading = true;
     notifyListeners();
-    final response = await http.patch('$baseUrl/$id.jsons',
-        body: json.encode({
-          "id": id,
-          "title": title,
-          "price": price,
-          "description": description,
-          "image_url": imageUrl,
-          "is_favourite": !isFavourite,
-        }));
+    final response = await http.put('$baseUrl/userFavourites/$userId/$id.json?auth=$token',
+        body: json.encode(
+          !isFavourite,
+        ));
     isLoading = false;
 
     if (response.statusCode == 200) {

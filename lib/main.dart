@@ -23,11 +23,19 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ProductsProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProxyProvider<AuthProvider, ProductsProvider>(
+          create: (_) => ProductsProvider('', '', []),
+          update: (ctx, auth, prev) => ProductsProvider(
+              auth.token, auth.userId, prev.productList == null ? [] : prev.productList),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, OrderProvider>(
+          create: (_) => OrderProvider('', '', []),
+          update: (ctx, auth, prev) =>
+              OrderProvider(auth.token, auth.userId, prev.orders == null ? [] : prev.orders),
+        ),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => Product()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: Consumer<AuthProvider>(
         builder: (context, authData, _) => MaterialApp(
@@ -37,14 +45,14 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Lato',
           ),
           debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
+          title: 'Shoppy',
           home: authData.authorized ? ProductsScreen() : AuthScreen(),
           routes: {
             AuthScreen.SCREEN_ID: (context) => AuthScreen(),
             ProductsScreen.SCREEN_ID: (context) => ProductsScreen(),
+            OrdersScreen.SCREEN_ID: (context) => OrdersScreen(),
             ProductDetailsScreen.SCREEN_ID: (context) => ProductDetailsScreen(),
             CartScreen.SCREEN_ID: (context) => CartScreen(),
-            OrdersScreen.SCREEN_ID: (context) => OrdersScreen(),
             UserProductsScreen.SCREEN_ID: (context) => UserProductsScreen(),
             EditProductScreen.SCREEN_ID: (context) => EditProductScreen(),
           },

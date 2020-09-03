@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shoppy/providers/auth_provider.dart';
 import 'package:shoppy/providers/cart_provider.dart';
 import 'package:shoppy/providers/product_provider.dart';
 import 'package:shoppy/screens/product_details_screen.dart';
@@ -8,6 +9,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
+    final authData = Provider.of<AuthProvider>(context);
 
     return Consumer<Product>(
       builder: (BuildContext context, value, Widget child) {
@@ -31,11 +33,12 @@ class ProductItem extends StatelessWidget {
                     : Icon(value.isFavourite ? Icons.favorite : Icons.favorite_border),
                 onPressed: () {
                   //TODO fix error
-                  value.toggleFavourite().catchError(
+                  value.toggleFavourite(authData.token, authData.userId).catchError(
                         (error) => Scaffold.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              'Error happened!',
+//                              'Error happened!',
+                              error.toString(),
                               textAlign: TextAlign.center,
                             ),
                           ),

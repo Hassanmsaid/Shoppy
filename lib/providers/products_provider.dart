@@ -8,6 +8,10 @@ import 'package:shoppy/providers/product_provider.dart';
 class ProductsProvider with ChangeNotifier {
   static const baseUrl = 'https://shoppy-60a.firebaseio.com/products';
 
+  final String _token, _userId;
+
+  ProductsProvider(this._token, this._userId, this._productList);
+
   List<Product> _productList = [
 //    Product(
 //      id: 'p3',
@@ -49,10 +53,18 @@ class ProductsProvider with ChangeNotifier {
     return _productList.firstWhere((element) => element.id == id);
   }
 
-  Future getAllProducts() async {
+  Future getAllProducts({bool all = true}) async {
     try {
-      final response = await http.get('$baseUrl.json');
+      final url = all
+          ? '$baseUrl.json?auth=$_token'
+          : '$baseUrl.json?auth=$_token&orderBy="userId"&equalTo="$_userId"';
+      final response = await http.get(url);
       final fetchedProducts = json.decode(response.body) as Map<String, dynamic>;
+
+      final favouritesResponse = await http
+          .get('https://shoppy-60a.firebaseio.com/userFavourites/$_userId.json?auth=$_token');
+      final favData = json.decode(favouritesResponse.body);
+
       _productList.clear();
       fetchedProducts.forEach((key, value) {
         _productList.add(Product(
@@ -61,7 +73,7 @@ class ProductsProvider with ChangeNotifier {
             description: value['description'],
             imageUrl: value['image_url'],
             price: value['price'],
-            isFavourite: value['is_favourite']));
+            isFavourite: favData == null ? false : favData[key] ?? false));
       });
       notifyListeners();
     } catch (e) {
@@ -71,14 +83,14 @@ class ProductsProvider with ChangeNotifier {
 
   Future addProduct(Product product) {
     return http
-        .post('$baseUrl.json',
+        .post('$baseUrl.json?auth=$_token',
             body: json.encode({
               "id": product.id,
               "title": product.title,
               "price": product.price,
               "description": product.description,
               "image_url": product.imageUrl,
-              "is_favourite": product.isFavourite,
+              "userId": _userId,
             }))
         .then((response) {
       product.id = json.decode(response.body)['name'];
@@ -92,7 +104,7 @@ class ProductsProvider with ChangeNotifier {
   Future updateProduct(Product updatedProduct) async {
     final index = _productList.lastIndexWhere((element) => element.id == updatedProduct.id);
     if (index > -1) {
-      await http.patch('$baseUrl/${updatedProduct.id}.json',
+      await http.patch('$baseUrl/${updatedProduct.id}.json?auth=$_token',
           body: json.encode({
             "title": updatedProduct.title,
             "price": updatedProduct.price,
@@ -106,30 +118,11 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future deleteProduct(String id) async {
-    final response = await http.delete('$baseUrl/$id.json');
+    final response = await http.delete('$baseUrl/$id.json?auth=$_token');
     if (response.statusCode != 200) {
       throw CustomExceptions('Delete failed!');
     }
     _productList.removeWhere((prod) => prod.id == id);
-    notifyListeners();
-  }
-
-  Future toggleFavourite(String id) async {
-    final product = _productList.firstWhere((element) => element.id == id);
-    final response = await http.patch('$baseUrl/$id.json',
-        body: json.encode({
-          "id": product.id,
-          "title": product.title,
-          "price": product.price,
-          "description": product.description,
-          "image_url": product.imageUrl,
-          "is_favourite": !product.isFavourite,
-        }));
-    if (response.statusCode == 200) {
-      product.isFavourite = !product.isFavourite;
-    } else {
-      throw CustomExceptions('Failed!');
-    }
     notifyListeners();
   }
 }

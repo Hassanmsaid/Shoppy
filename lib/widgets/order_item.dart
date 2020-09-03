@@ -43,9 +43,10 @@ class _OrderItemState extends State<OrderItem> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(widget.order.products[i].title),
-                              Text('\$${widget.order.products[i].price.toStringAsFixed(2)}'),
-                              Text('x${widget.order.products[i].quantity}'),
+                              OrderProductItem(widget.order.products[i].title),
+                              OrderProductItem(
+                                  '\$${widget.order.products[i].price.toStringAsFixed(2)}'),
+                              OrderProductItem('x${widget.order.products[i].quantity}'),
                             ],
                           ),
                         );
@@ -54,6 +55,20 @@ class _OrderItemState extends State<OrderItem> {
               : Container()
         ],
       ),
+    );
+  }
+}
+
+class OrderProductItem extends StatelessWidget {
+  final String text;
+
+  OrderProductItem(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: Center(child: Text(text)),
     );
   }
 }
