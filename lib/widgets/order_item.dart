@@ -34,23 +34,24 @@ class _OrderItemState extends State<OrderItem> {
               ? Container(
                   height: widget.order.products.length * 50.0,
                   child: ListView.builder(
-                      itemCount: widget.order.products.length,
-                      itemBuilder: (_, i) {
-                        return Container(
-                          color: Theme.of(context).accentColor,
-                          margin: EdgeInsets.all(4),
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              OrderProductItem(widget.order.products[i].title),
-                              OrderProductItem(
-                                  '\$${widget.order.products[i].price.toStringAsFixed(2)}'),
-                              OrderProductItem('x${widget.order.products[i].quantity}'),
-                            ],
-                          ),
-                        );
-                      }),
+                    itemCount: widget.order.products.length,
+                    itemBuilder: (_, i) {
+                      return Container(
+                        color: Theme.of(context).accentColor,
+                        margin: EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            OrderProductItem(widget.order.products[i].title),
+                            OrderProductItem(
+                                '\$${widget.order.products[i].price.toStringAsFixed(2)}'),
+                            OrderProductItem('x${widget.order.products[i].quantity}'),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 )
               : Container()
         ],

@@ -18,9 +18,12 @@ class ProductItem extends StatelessWidget {
             Navigator.of(context).pushNamed(ProductDetailsScreen.SCREEN_ID, arguments: value.id);
           },
           child: GridTile(
-            child: Image.network(
-              value.imageUrl,
-              fit: BoxFit.cover,
+            child: Hero(
+              tag: value.id,
+              child: Image.network(
+                value.imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
             footer: GridTileBar(
               backgroundColor: Colors.grey.shade500.withOpacity(0.5),

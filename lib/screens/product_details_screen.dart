@@ -15,9 +15,9 @@ class ProductDetailsScreen extends StatelessWidget {
     final authData = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(currentProduct.title),
-      ),
+      // appBar: AppBar(
+      //   title: Text(currentProduct.title),
+      // ),
       floatingActionButton: Consumer<Product>(
         builder: (context, product, child) {
           return FloatingActionButton(
@@ -28,43 +28,59 @@ class ProductDetailsScreen extends StatelessWidget {
               });
         },
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            height: 300,
-            width: double.infinity,
-            child: Image.network(
-              currentProduct.imageUrl,
-              fit: BoxFit.cover,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 260,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(currentProduct.title),
+              background: Hero(
+                tag: prodId,
+                child: Image.network(
+                  currentProduct.imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  currentProduct.title,
-                  textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  color: Theme.of(context).accentColor,
-                  padding: EdgeInsets.all(8),
-                  child: Text(
-                    '\$${currentProduct.price}',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            currentProduct.title,
+                            textAlign: TextAlign.left,
+                            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                          ),
+                          Container(
+                            color: Theme.of(context).accentColor,
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              '\$${currentProduct.price}',
+                              style: TextStyle(fontSize: 20),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        currentProduct.description,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ],
+                )
               ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              currentProduct.description,
-              style: TextStyle(fontSize: 18),
             ),
           ),
         ],
