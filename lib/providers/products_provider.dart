@@ -58,11 +58,11 @@ class ProductsProvider with ChangeNotifier {
       final url = all
           ? '$baseUrl.json?auth=$_token'
           : '$baseUrl.json?auth=$_token&orderBy="userId"&equalTo="$_userId"';
-      final response = await http.get(url);
+      final response = await http.get(Uri.parse(url));
       final fetchedProducts = json.decode(response.body) as Map<String, dynamic>;
 
       final favouritesResponse = await http
-          .get('https://shoppy-60a.firebaseio.com/userFavourites/$_userId.json?auth=$_token');
+          .get(Uri.parse('https://shoppy-60a.firebaseio.com/userFavourites/$_userId.json?auth=$_token'));
       final favData = json.decode(favouritesResponse.body);
 
       _productList.clear();
@@ -83,7 +83,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future addProduct(Product product) {
     return http
-        .post('$baseUrl.json?auth=$_token',
+        .post(Uri.parse('$baseUrl.json?auth=$_token'),
             body: json.encode({
               "id": product.id,
               "title": product.title,
@@ -104,7 +104,7 @@ class ProductsProvider with ChangeNotifier {
   Future updateProduct(Product updatedProduct) async {
     final index = _productList.lastIndexWhere((element) => element.id == updatedProduct.id);
     if (index > -1) {
-      await http.patch('$baseUrl/${updatedProduct.id}.json?auth=$_token',
+      await http.patch(Uri.parse('$baseUrl/${updatedProduct.id}.json?auth=$_token'),
           body: json.encode({
             "title": updatedProduct.title,
             "price": updatedProduct.price,
@@ -118,7 +118,7 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future deleteProduct(String id) async {
-    final response = await http.delete('$baseUrl/$id.json?auth=$_token');
+    final response = await http.delete(Uri.parse('$baseUrl/$id.json?auth=$_token'));
     if (response.statusCode != 200) {
       throw CustomExceptions('Delete failed!');
     }

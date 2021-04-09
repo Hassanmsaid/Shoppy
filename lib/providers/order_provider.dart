@@ -31,7 +31,7 @@ class OrderProvider with ChangeNotifier {
 
   void createOrder(List<Cart> cartProducts, double total) async {
     final timeStamp = DateTime.now();
-    final response = await http.post('$baseUrl/$_userId.json?auth=$_token',
+    final response = await http.post(Uri.parse('$baseUrl/$_userId.json?auth=$_token'),
         body: json.encode({
           'amount': total,
           'date': timeStamp.toIso8601String(),
@@ -57,7 +57,7 @@ class OrderProvider with ChangeNotifier {
   }
 
   Future getOrders() async {
-    final response = await http.get('$baseUrl/$_userId.json?auth=$_token');
+    final response = await http.get(Uri.parse('$baseUrl/$_userId.json?auth=$_token'));
     if (response.statusCode == 200) {
       List<Order> loadedOrders = [];
       final data = json.decode(response.body) as Map<String, dynamic>;

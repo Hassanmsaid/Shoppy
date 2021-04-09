@@ -15,7 +15,7 @@ class AuthProvider extends ChangeNotifier {
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$method?key=AIzaSyBP90kTmoF_plI7J93mAafC75o_0AslPNU';
     try {
-      final response = await http.post(url,
+      final response = await http.post(Uri.parse(url),
           body: json.encode({
             'email': email,
             'password': password,

@@ -24,7 +24,7 @@ class Product extends ChangeNotifier {
 //    final product = _productList.firstWhere((element) => element.id == id);
     isLoading = true;
     notifyListeners();
-    final response = await http.put('$baseUrl/userFavourites/$userId/$id.json?auth=$token',
+    final response = await http.put(Uri.parse('$baseUrl/userFavourites/$userId/$id.json?auth=$token'),
         body: json.encode(
           !isFavourite,
         ));
